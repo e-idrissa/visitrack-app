@@ -26,10 +26,10 @@ import axios from "axios";
 import { toast } from "sonner";
 
 type Props = {
-  username: string;
+  userId: string;
 };
 
-export function NewVisitForm({ username }: Props) {
+export function NewVisitForm({ userId }: Props) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof NewVisitFormSchema>>({
@@ -43,7 +43,7 @@ export function NewVisitForm({ username }: Props) {
 
   async function onSubmit(data: z.infer<typeof NewVisitFormSchema>) {
     try {
-      const res = await axios.post("api/visits", { data, username });
+      const res = await axios.post("api/visits", { data, userId });
       if (res.status === 200) {
         toast.success("Visit created successfully");
         router.refresh();

@@ -10,12 +10,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const user = await currentUser();
-  console.log(user?.username)
+
   return (
     <div className="w-full h-screen flex flex-col">
-      <div className="bg-pattern px-40 pt-10 pb-20">
+      <div className="bg-pattern px-40 pt-10 pb-40">
         <div className="flex items-center justify-between">
           <Logo />
           <div className="flex items-center space-x-4">
@@ -24,12 +23,15 @@ export default async function RootLayout({
           </div>
         </div>
         <div className="font-bold text-4xl pt-10 pb-8 flex items-center">
-          <span className="text-white">Welcome back, </span>
-          <span>@{user?.username}👋</span>
+          <span className="text-white">Welcome back, @{user?.username}👋</span>
         </div>
-        {/* <Insights /> */}
+        <Insights />
       </div>
-      <div className="bg-white">{children}</div>
+      <div className="bg-white h-full relative flex items-center justify-center">
+        <div className="absolute p-8 w-4/5 -top-20 rounded-3xl h-[36rem] bg-white text-primary">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

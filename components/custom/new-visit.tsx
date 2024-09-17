@@ -7,7 +7,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { NewVisitForm } from "./form/new-visit"
-import { User } from "@prisma/client"
 
 type Props = {
   user: string
@@ -23,7 +22,7 @@ export function NewVisit({ user }: Props) {
         <DialogHeader>
           <DialogTitle>Add Visit</DialogTitle>
         </DialogHeader>
-        <NewVisitForm username={user!}/>
+        <NewVisitForm userId={user!}/>
       </DialogContent>
     </Dialog>
   )

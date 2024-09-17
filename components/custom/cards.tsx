@@ -32,7 +32,7 @@ const Insights = async () => {
   ];
 
   return (
-    <div className="pb-56 flex gap-x-3">
+    <div className="flex gap-x-3">
       {insights.map(({ label, count, icon }) => (
         <Insight key={label} label={label} count={count ?? 0} icon={icon} />
       ))}
