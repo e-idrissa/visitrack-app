@@ -24,7 +24,7 @@ export async function PATCH(req: Request) {
     const setDate = (date: Date, hour: number, minutes: number): Date => {
       const updatedDate = new Date(date);
       const dateWithHour = updatedDate.setHours(hour, minutes, 0, 0);
-      return updatedDate;
+      return new Date(dateWithHour);
     };
 
     const leavingDate = new Date();

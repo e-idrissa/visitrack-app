@@ -2,8 +2,7 @@ import Insights from "@/components/custom/cards";
 import Logo from "@/components/custom/logo";
 import NavList from "@/components/custom/nav-list";
 import { UserButton } from "@clerk/nextjs";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function RootLayout({
   children,
