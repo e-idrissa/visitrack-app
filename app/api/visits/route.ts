@@ -1,11 +1,11 @@
-import { GetUser } from "@/lib/actions/user.actions";
 import { db } from "@/lib/db/prisma";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const values = await req.json();
-    const user = await GetUser(values.username);
+    const user = await currentUser()
 
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
