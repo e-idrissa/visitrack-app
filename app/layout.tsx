@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
-} from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
 import { poppins } from "@/lib/fonts";
+import { Toaster } from "@/components/ui/sonner";
 
 
 export const metadata: Metadata = {
@@ -27,6 +21,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${poppins.className} bg-white`}>
           {children}
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

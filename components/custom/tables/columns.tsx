@@ -97,7 +97,7 @@ export const columns: ColumnDef<Visit>[] = [
     header: () => <div className="text-center">Exit At</div>,
     cell: ({ row }) => {
       const formatted = dateFormat(row.getValue("leaving_at"));
-      return <div className="text-center font-medium">{formatted}</div>;
+      return <div className="text-center font-medium">{row.getValue("leaving_at") ? formatted : "--:--"}</div>;
     },
     size: 150,
   },
