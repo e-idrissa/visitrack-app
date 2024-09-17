@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Visit {
+  id          String   @unique @default(uuid())
+  name        String
+  lastname    String
+  entering_at DateTime @default(now())
+  leaving_at  DateTime? 
+  status      Boolean @default(true)
+  reason      String
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
