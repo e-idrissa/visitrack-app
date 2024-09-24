@@ -27,7 +27,7 @@ export async function PATCH(req: Request) {
       return new Date(dateWithHour);
     };
 
-    const leavingDate = new Date();
+    const leavingDate = new Date(values.data.endingDate);
 
     const status = values.data.status === "inProgress" ? true : false;
 

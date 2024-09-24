@@ -19,13 +19,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { CalendarIcon, Clock } from "lucide-react";
 import { EditVisitFormSchema } from "@/lib/db/schemas";
 import { Visit } from "@prisma/client";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type Props = {
   visit: Visit;
@@ -40,8 +49,10 @@ export function EditVisitForm({ visit }: Props) {
       lastname: visit.lastname,
       reason: visit.reason,
       status: visit.status ? "inProgress" : "ended",
+      startingDate: visit.entering_at,
       startingHour: visit.entering_at.getHours().toString(),
       startingMin: visit.entering_at.getMinutes().toString(),
+      endingDate: visit.leaving_at ? visit.leaving_at : undefined,
       endingHour: visit.leaving_at
         ? visit.leaving_at.getHours().toString()
         : undefined,
@@ -56,7 +67,7 @@ export function EditVisitForm({ visit }: Props) {
       const res = await axios.patch(`/api/visits/${visit.id}`, {
         data,
         userId: visit.userId,
-        visitId: visit.id
+        visitId: visit.id,
       });
       if (res.status === 200) {
         toast.success("Visit updated successfully");
@@ -147,105 +158,11 @@ export function EditVisitForm({ visit }: Props) {
               </FormItem>
             )}
           />
-        </div>
-        <div className="flex items-center space-x-6 w-full">
-          <div className="flex relative items-center w-[70%] border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
-            <Label className="absolute text-[#705fcc] left-3 py-2 top-0 text-xs">
-              Started At
-            </Label>
-            <div className="w-it flex space-x-2">
-              <div className="flex items-center w-fit pt-4">
-                <FormField
-                  control={form.control}
-                  name="startingHour"
-                  render={({ field }) => (
-                    <FormItem className="w-fit rounded-md flex items-center justify-center">
-                      <FormControl className="">
-                        <Input
-                          placeholder="HH"
-                          {...field}
-                          className="border-transparent text-center w-[3.2rem] px-0 pl-3 pr-1"
-                          type="number"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <span className="text-primary">:</span>
-                <FormField
-                  control={form.control}
-                  name="startingMin"
-                  render={({ field }) => (
-                    <FormItem className="w-fit rounded-md flex items-center justify-center">
-                      <FormControl className="">
-                        <Input
-                          placeholder="MM"
-                          {...field}
-                          className="border-transparent text-center w-[3.2rem] px-0 pl-3 pr-1"
-                          type="number"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex relative items-center w-[70%] border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
-            <Label className="absolute text-[#705fcc] left-3 py-2 top-0 text-xs">
-              Ended At
-            </Label>
-            <div className="w-it flex space-x-2">
-              <div className="flex items-center w-fit pt-4">
-                <FormField
-                  control={form.control}
-                  name="endingHour"
-                  render={({ field }) => (
-                    <FormItem className="w-fit rounded-md flex items-center justify-center">
-                      <FormControl className="">
-                        <Input
-                          placeholder="HH"
-                          {...field}
-                          className="border-transparent text-center w-[3.2rem] px-0 pl-3 pr-1"
-                          type="number"
-                          min={form.getValues("startingHour")}
-                          max={23}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <span className="text-primary">:</span>
-                <FormField
-                  control={form.control}
-                  name="endingMin"
-                  render={({ field }) => (
-                    <FormItem className="w-fit rounded-md flex items-center justify-center">
-                      <FormControl className="">
-                        <Input
-                          placeholder="MM"
-                          {...field}
-                          className="border-transparent text-center w-[3.2rem] px-0 pl-3 pr-1"
-                          type="number"
-                          min={0}
-                          max={59}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-          </div>
           <FormField
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem className="w-full relative border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
+              <FormItem className="w-2/3 relative border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
                 <Label className="absolute text-[#705fcc] left-3 py-2 text-xs">
                   Status
                 </Label>
@@ -267,6 +184,173 @@ export function EditVisitForm({ visit }: Props) {
               </FormItem>
             )}
           />
+        </div>
+        <div className="flex flex-col space-y-6 w-full">
+          <div className="flex relative items-center w-full border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
+            <Label className="absolute text-[#705fcc] left-3 py-2 top-0 text-xs">
+              Started At
+            </Label>
+            <div className="w-full flex justify-between text-primary">
+              <FormField
+                control={form.control}
+                name="startingDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col pt-4 pb-[0.065rem]">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"calendar"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left text-primary font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center w-fit pt-4">
+                <Clock className="ml-auto h-4 w-4 opacity-50"/>
+                <FormField
+                  control={form.control}
+                  name="startingHour"
+                  render={({ field }) => (
+                    <FormItem className="w-fit rounded-md flex items-center justify-center">
+                      <FormControl className="">
+                        <Input
+                          placeholder="HH"
+                          {...field}
+                          className="border-transparent text-center w-[3.6rem] px-0 pl-3 pr-1"
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className="text-primary">:</span>
+                <FormField
+                  control={form.control}
+                  name="startingMin"
+                  render={({ field }) => (
+                    <FormItem className="w-fit rounded-md flex items-center justify-center">
+                      <FormControl className="">
+                        <Input
+                          placeholder="MM"
+                          {...field}
+                          className="border-transparent text-center w-[3.6rem] px-0 pl-3 pr-1"
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex relative items-center w-full border border-[#E1E1E1] bg-[#F0EDFF] rounded-md">
+            <Label className="absolute text-[#705fcc] left-3 py-2 top-0 text-xs">
+              Ended At
+            </Label>
+            <div className="w-full flex justify-between text-primary">
+              <FormField
+                control={form.control}
+                name="endingDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col pt-4 pb-[0.065rem]">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"calendar"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left text-primary font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < visit.entering_at}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center w-fit pt-4">
+                <Clock className="ml-auto h-4 w-4 opacity-50"/>
+                <FormField
+                  control={form.control}
+                  name="endingHour"
+                  render={({ field }) => (
+                    <FormItem className="w-fit rounded-md flex items-center justify-center">
+                      <FormControl className="">
+                        <Input
+                          placeholder="HH"
+                          {...field}
+                          className="border-transparent text-center w-[3.6rem] px-0 pl-3 pr-1"
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className="text-primary">:</span>
+                <FormField
+                  control={form.control}
+                  name="endingMin"
+                  render={({ field }) => (
+                    <FormItem className="w-fit rounded-md flex items-center justify-center">
+                      <FormControl className="">
+                        <Input
+                          placeholder="MM"
+                          {...field}
+                          className="border-transparent text-center w-[3.6rem] px-0 pl-3 pr-1"
+                          type="number"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <Button
           type="submit"
