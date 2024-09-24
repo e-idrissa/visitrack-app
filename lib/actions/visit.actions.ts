@@ -56,7 +56,7 @@ export async function GetYesterdaysVisits(): Promise<number> {
 
     return visits.length; // Returning the number of visits
   } catch (error) {
-    console.log("Error fetching visits", error);
+    console.log("Error fetching or calculating yesterday visits:", error);
     throw error;
   }
 }
@@ -88,9 +88,20 @@ export async function GetAverageDailyVisits(): Promise<number> {
     const totalVisits = visits.length;
     const averageVisitsPerDay = totalVisits / totalDays;
 
-    return averageVisitsPerDay;
+    return Math.round(averageVisitsPerDay);
   } catch (error) {
-    console.error("Error fetching or calculating visits:", error);
+    console.error("Error fetching or calculating average visits:", error);
     throw error; // Re-throw the error for proper handling in calling code
+  }
+}
+
+export async function GetAllVisits(): Promise<number> {
+  try {
+    const visits = await db.visit.findMany()
+
+    return visits.length
+  } catch (error) {
+    console.error("Error fetching or calculating total visits:", error);
+    throw error;
   }
 }

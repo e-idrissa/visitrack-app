@@ -1,8 +1,9 @@
 import {
+  GetAllVisits,
   GetAverageDailyVisits,
   GetYesterdaysVisits,
 } from "@/lib/actions/visit.actions";
-import { Activity, ChartNoAxesColumn, LucideProps } from "lucide-react"; // Import LucideProps for type reference
+import { Activity, ChartNoAxesColumn, LucideProps, Sigma } from "lucide-react"; // Import LucideProps for type reference
 
 type Props = {
   label: string;
@@ -25,10 +26,12 @@ const Insight = ({ label, count, icon: Icon }: Props) => {
 const Insights = async () => {
   const averageVisits = await GetAverageDailyVisits();
   const yesterdaysVisits = await GetYesterdaysVisits();
+  const totalVisits = await GetAllVisits()
 
   const insights = [
     { label: "Yesterday's Visits", count: yesterdaysVisits, icon: Activity },
     { label: "Average Visits", count: averageVisits, icon: ChartNoAxesColumn },
+    { label: "Total Visits", count: totalVisits, icon: Sigma },
   ];
 
   return (
