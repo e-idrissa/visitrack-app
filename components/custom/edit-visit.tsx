@@ -9,15 +9,19 @@ import {
 import { Edit3 } from "lucide-react"
 import { EditVisitForm } from "./form/edit-visit"
 import { Visit } from "@prisma/client"
+import { useState } from "react"
 
 type Props = {
   visit: Visit
 }
 
 export function EditVisit({ visit }: Props) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const toggleDialog = () => setIsOpen(false)
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
       <Button variant="edit"><Edit3 className="size-4 mr-1"/>Edit</Button>
       </DialogTrigger>
@@ -25,7 +29,7 @@ export function EditVisit({ visit }: Props) {
         <DialogHeader>
           <DialogTitle>Edit Visit</DialogTitle>
         </DialogHeader>
-        <EditVisitForm visit={visit}/>
+        <EditVisitForm visit={visit} onSuccess={toggleDialog}/>
       </DialogContent>
     </Dialog>
   )

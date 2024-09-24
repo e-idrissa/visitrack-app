@@ -27,9 +27,10 @@ import { toast } from "sonner";
 
 type Props = {
   userId: string;
+  onSuccess: () => void;
 };
 
-export function NewVisitForm({ userId }: Props) {
+export function NewVisitForm({ userId, onSuccess }: Props) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof NewVisitFormSchema>>({
@@ -47,6 +48,7 @@ export function NewVisitForm({ userId }: Props) {
       if (res.status === 200) {
         toast.success("Visit created successfully");
         router.refresh();
+        onSuccess()
       }
     } catch (error) {
       toast.error("Something went wrong");

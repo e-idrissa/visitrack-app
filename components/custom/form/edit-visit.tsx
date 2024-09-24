@@ -38,9 +38,10 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   visit: Visit;
+  onSuccess: () => void;
 };
 
-export function EditVisitForm({ visit }: Props) {
+export function EditVisitForm({ visit, onSuccess }: Props) {
   const router = useRouter();
   const form = useForm<z.infer<typeof EditVisitFormSchema>>({
     resolver: zodResolver(EditVisitFormSchema),
@@ -72,6 +73,7 @@ export function EditVisitForm({ visit }: Props) {
       if (res.status === 200) {
         toast.success("Visit updated successfully");
         router.refresh();
+        onSuccess()
       }
     } catch (error) {
       console.log(error);
